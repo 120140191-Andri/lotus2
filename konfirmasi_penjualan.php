@@ -60,12 +60,19 @@ $(document).ready(function(){
         var ppn      = $(this).attr("data-ppn");
         var totppn   = parseInt(totaljl) * parseInt(ppn) / 100;
         var hasilppn = parseInt(totaljl) - parseInt(totppn);
+        $("#nppn").val(ppn);
         $("#ppn").val(hasilppn);
         
         var diskon      = $(this).attr("data-diskon");
         var hasildiskon = (diskon/100)*totaljl;
         var totaldiskon = hasilppn - hasildiskon; 
+        $("#ndiskon").val(diskon);
         $("#diskon").val(totaldiskon);
+
+        var tenor = $(this).attr("data-tenor");
+        $('.itenor').val(tenor);
+        $('.ippn').val(ppn);
+        $('.idiskon').val(diskon);
         
         var sisa = $(this).attr("data-sisa");
         $("#sisa").val(sisa);
@@ -83,16 +90,16 @@ $(document).ready(function(){
         
         var detail = $(this).attr("detail");
         
+        $('.entryfield6').show(1000);
+
         if (detail == "True"){
             $('#rpsisa').text("Lunas");
-            $('.entryfield6').hide(1000);
             $('#nominal_bayar').val("");
             $('#totsis').val("");
             $('#rptotsisa').text("");
             $('#rpinp').text("");
             $('.konfir').hide();
         }else{
-            $('.entryfield6').hide();
             $('.konfir').show();
         }
 
@@ -122,22 +129,47 @@ function tampil_datax(nonota){
                     <td style="text-align:center">`+ value.barang_id +`</td>
                     <td style="text-align:center">`+ value.barang_nama +`</td>
                     <td style="text-align:center" id="pjumlah">`+ value.penjualan_jumlah +` Frame</td>
-                    <td style="text-align:center"> <input type="number" min="0" value="0" class="inqty" onClick="ubah()"><input type="hidden" id="id_jual" value="`+ value.penjualan_id +`"> Frame</td>
-                    <td style="text-align:center">`+ formatRupiah(value.barang_harga, "Rp:") +`
-                    <input type="hidden" id="ttlhrg" value="`+ total +`"></td>
+                    <td style="text-align:center"> <input type="number" min="0" class="inqty-`+value.penjualan_id+`" value="`+value.penjualan_jumlah+`"><input type="hidden" id="id_jual"> <a class="ubah-btn detail-nota badge_status_aktif konfir" data-idp="`+value.penjualan_id+`">Ubah</a></td>
+                    <td style="text-align:center">`+ formatRupiah(value.barang_harga, "Rp:") +`</td>
                 </tr>`;
-                // onClick="ubah()"
                 
-            
             });
+            $('#ttlhrg').val(total);
             $('.tampil-dt').html(dt);
             $('#totaljual').val(formatRupiah($('#ttlhrg').val(), ""));
-            $('#ppn1').val(formatRupiah($('#ppn').val(), ""));
-            $("#diskon1").val(formatRupiah($('#diskon').val(), ""));
+            
+            var totppn   = parseInt($('#ttlhrg').val()) * parseInt($('#nppn').val()) / 100;
+            var hasilppn = parseInt($('#ttlhrg').val()) - parseInt(totppn);
+            $('#ppn1').val(hasilppn);
+            $('#ppn1').val(formatRupiah($('#ppn1').val(), ""));
+            
+            var hasildiskon = ($("#ndiskon").val()/100)*parseInt($('#ttlhrg').val());
+            var totaldiskon = hasilppn - hasildiskon; 
+            $("#diskon1").val(totaldiskon);
+            $("#diskon1").val(formatRupiah($('#diskon1').val(), ""));
 		}
 	});
 
 }
+
+$(document).ready(function(){
+    $('#tb-dt').on('click', '.ubah-btn', function(){
+        var idp = $(this).attr('data-idp');
+        var qty = $('.inqty-'+idp).val();
+        var notrans = $('#notrans').val();
+        $.ajax({
+            type: 'POST',
+		    url: "library/ubah_penjualan_jumlah.php",
+            data: {
+                id_jual: idp,
+                qty: qty,
+            },
+            success: function(respon) {
+                tampil_datax(notrans);
+            }
+        });
+    });
+});
 
 // function tampil_qty(nonota){
 
@@ -158,28 +190,28 @@ function tampil_datax(nonota){
 </script>
 <script>
 
-    function ubah(){
-        $(document).on('keypress',function(e) {
-            if(e.which == 13) {
-                var id_jual = $('#id_jual').val();
-                var nonota = $("#nojual").val();
-                var notrans = $('#notrans').val();
-                var qty = $('.inqty').val();
+    // function ubah(){
+    //     $(document).on('keypress',function(e) {
+    //         if(e.which == 13) {
+    //             var id_jual = $('#id_jual').val();
+    //             var nonota = $("#nojual").val();
+    //             var notrans = $('#notrans').val();
+    //             var qty = $('.inqty').val();
                 
-                $.ajax({
-                    type: 'POST',
-		            url: "library/ubah_penjualan_jumlah.php",
-                    data: {
-                        id_jual: id_jual,
-                        qty: qty,
-                    },
-                    success: function(respon) {
-                        tampil_datax(notrans);
-                    }
-                });
-            }
-        });
-    }
+    //             $.ajax({
+    //                 type: 'POST',
+	// 	            url: "library/ubah_penjualan_jumlah.php",
+    //                 data: {
+    //                     id_jual: id_jual,
+    //                     qty: qty,
+    //                 },
+    //                 success: function(respon) {
+    //                     tampil_datax(notrans);
+    //                 }
+    //             });
+    //         }
+    //     });
+    // }
 
 </script>
 
@@ -256,14 +288,16 @@ function tampil_datax(nonota){
                     </div> 
                     <div class="entryfield6">
                         <div class="detailpop">
-                        <h5 class="headnavigation">Sisa Nota jual (Rp.)</h5>
-    
-                        <p>Total Sisa: <input type="number" class="textinput4" id="totsis" readonly required></p>
-                        &nbsp;<h4 id="rptotsisa"></h4>
-                        <br><br>
-						<h5 class="headnavigation">Nominal Bayar (Rp.)<redfont><i>(Harus diisi)</i></redfont></h5>
-				        <input class="textinput4 " type="number" id="nominal_bayar" name="nominal_bayar" value="" autocomplete="off" value="0"><h3 class="headnavigation" style="float:left; margin:10px 0px 0px 5px;"></h3>
-                        &nbsp;<h4 id="rpinp"></h4>
+                        <!-- <h5 class="headnavigation">Sisa Nota jual (Rp.)</h5>
+     -->
+                        <label>Tenor (Hari)
+                        <input class="textinput4 itenor" type="text" value="" autocomplete="off" value="0"><h3 class="headnavigation" style="float:left; margin:10px 0px 0px 5px;"></h3></label><br>
+
+                        <label>Diskon (%)
+                        <input class="textinput4 idiskon" type="text" value="" autocomplete="off" value="0"><h3 class="headnavigation" style="float:left; margin:10px 0px 0px 5px;"></h3></label><br>
+
+                        <label>PPN (%)
+                        <input class="textinput4 ippn" type="text" value="" autocomplete="off" value="0"><h3 class="headnavigation" style="float:left; margin:10px 0px 0px 5px;"></h3></label><br>
                         
                         <!-- rupiah -->
                         <script>
@@ -337,6 +371,7 @@ function tampil_datax(nonota){
                         <tbody class="tampil-dt" id="tb-dt">
                                     
                         </tbody>
+                        <input type="hidden" id="ttlhrg" value="">
                     </table>
                     
                     <!-- <h5 class="headnavigation">Total Nota jual (Rp.)</h5>
@@ -345,14 +380,24 @@ function tampil_datax(nonota){
                     <div class="entryfield5">
                        <br><br>
                        <h5 class="headnavigation">Jumlah Sebelum Diskon Dari PPN</h5>
+                       <input class="textinput4" type="hidden" name="" id="nppn" value="" autocomplete="off" readonly>
                        <input class="textinput4" type="hidden" name="totaljual" id="ppn" value="" autocomplete="off" readonly>
+                       <input type="hidden" id="nnppn">
                        <input class="textinput4" type="text" name="totaljual" id="ppn1" value="" autocomplete="off" readonly><br><hr>
                        <h5 class="headnavigation">Jumlah Setelah Diskon Dari PPN</h5>
+                       <input class="textinput4" type="hidden" name="" id="ndiskon" value="" autocomplete="off" readonly>
                        <input class="textinput4" type="hidden" name="totaljual" id="diskon" value="" autocomplete="off" readonly>
                        <input class="textinput4" type="text" name="totaljual" id="diskon1" value="" autocomplete="off" readonly><br><hr>
                     </div> 
+                    <!-- <script type="text/javascript">
+                            var cleave = new Cleave('#ppn1', {
+                                numeral: true,
+                                numeralDecimalMark: 'thousand',
+                                delimiter: '.'
+                            });
+                    </script> -->
                         
-                    <div class="konfirmasi" style="position: absolute; margin-top: 450;">
+                    <div class="konfirmasi" style="position: absolute; margin-top: 450; margin-left: 950px;">
                         <a class="formsubmit boxsubmit badge_status_aktif konfir" id="terima" >Terima</a>
                         <a class="formsubmit boxsubmit badge_status_non_aktif konfir" id="tolak" >Tolak</a>
                         <div class="formsubmitcancel" onclick="datalookup('dcctable'); datahide('detailentry');"><h5>Kembali</h5></div>
@@ -432,7 +477,7 @@ function tampil_datax(nonota){
                         <tbody>
                         <?php
                             // ( 1 * penjualan_jumlah) 1 = harga penjualan nanti
-                            $transaksi = mysqli_query($db,"SELECT *,( barang_harga * penjualan_jumlah ) AS total FROM penjualan INNER JOIN transaksi ON penjualan.transaksi_id=transaksi.transaksi_id INNER JOIN barang ON penjualan.barang_id=barang.barang_id GROUP BY penjualan.transaksi_id");
+                            $transaksi = mysqli_query($db,"SELECT * ,SUM( barang_harga * penjualan_jumlah ) AS total FROM penjualan INNER JOIN transaksi ON penjualan.transaksi_id=transaksi.transaksi_id INNER JOIN barang ON penjualan.barang_id=barang.barang_id GROUP BY penjualan.transaksi_id ORDER BY transaksi.transaksi_proses ASC");
                             $i = 0;
                             
                             while($row = mysqli_fetch_array($transaksi))
@@ -478,6 +523,9 @@ function tampil_datax(nonota){
 
                                 <?php if ($sts == 0) : ?>
                                     <a class="datalookup detail-nota badge_status_aktif"
+                                    data-tenor="<?= $row['transaksi_tenor'] ?>"
+                                    data-ppn="<?= $row['transaksi_ppn'] ?>"
+                                    data-diskon="<?= $row['transaksi_diskon'] ?>"
                                     data-transaksi="<?= $row['transaksi_id'] ?>"
                                     data-sisa="<?= number_format($sisa,2) ?>"
                                     data-nota="<?= $row['transaksi_nota'];?>" 
@@ -489,6 +537,7 @@ function tampil_datax(nonota){
                                     >Detail</a>
                                     &nbsp;
                                     <a class="datalookup detail-nota badge_status_aktif"
+                                    data-tenor="<?= $row['transaksi_tenor'] ?>"
                                     data-ppn="<?= $row['transaksi_ppn'] ?>"
                                     data-diskon="<?= $row['transaksi_diskon'] ?>"
                                     data-transaksi="<?= $row['transaksi_id'] ?>"
@@ -501,6 +550,7 @@ function tampil_datax(nonota){
                                     detail="False"
                                     >Terima</a>
                                     <a class="datalookup detail-nota badge_status_non_aktif"
+                                    data-tenor="<?= $row['transaksi_tenor'] ?>"
                                     data-ppn="<?= $row['transaksi_ppn'] ?>"
                                     data-diskon="<?= $row['transaksi_diskon'] ?>"
                                     data-transaksi="<?= $row['transaksi_id'] ?>"
@@ -514,6 +564,7 @@ function tampil_datax(nonota){
                                     >Tolak</a>
                                 <?php else : ?>
                                     <a class="datalookup detail-nota badge_status_aktif"
+                                    data-tenor="<?= $row['transaksi_tenor'] ?>"
                                     data-ppn="<?= $row['transaksi_ppn'] ?>"
                                     data-diskon="<?= $row['transaksi_diskon'] ?>"
                                     data-transaksi="<?= $row['transaksi_id'] ?>"

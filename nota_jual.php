@@ -56,8 +56,28 @@ $(document).ready(function(){
         $("#tgljual").val(tglnota);
         
         var totaljual = $(this).attr("total-jual");
+        var totaljl   = $(this).attr("total-jl");
         $("#totaljual").val(totaljual);
         
+        var ppn      = $(this).attr("data-ppn");
+        var totppn   = parseInt(totaljl) * parseInt(ppn) / 100;
+        var hasilppn = parseInt(totaljl) - parseInt(totppn);
+        $("#nppn").val(ppn);
+        $("#ppn").val(hasilppn);
+        $("#ppn1").val(formatRupiah($("#ppn").val()));
+        
+        var diskon      = $(this).attr("data-diskon");
+        var hasildiskon = (diskon/100)*totaljl;
+        var totaldiskon = hasilppn - hasildiskon; 
+        $("#ndiskon").val(diskon);
+        $("#diskon").val(totaldiskon);
+        $("#diskon1").val(formatRupiah($("#diskon").val()));
+
+        var tenor = $(this).attr("data-tenor");
+        $('.itenor').val(tenor);
+        $('.ippn').val(ppn);
+        $('.idiskon').val(diskon);
+
         var sisa = $(this).attr("data-sisa");
         $("#sisa").val(sisa);
         $("#sisa2").val(formatRupiah(sisa, ""));
@@ -74,13 +94,14 @@ $(document).ready(function(){
         
         if (detail == "True"){
             $('#rpsisa').text("Lunas");
-            $('.entryfield6').hide(1000);
+            $('.inpt').hide();
             $('#nominal_bayar').val("");
             $('#totsis').val("");
             $('#rptotsisa').text("");
             $('#rpinp').text("");
         }else{
             $('.entryfield6').show(1000);
+            $('.inpt').show();
             $('#rpsisa').text(formatRupiah(sisa, "Rp:  "));
             $('#totsis').val(sisa);
             $('#totsis2').val(formatRupiah(sisa, ""));
@@ -169,7 +190,7 @@ function tampil_datax(nonota){
 				        <input class="textinput4 cleaveuang" type="text" id="jenis-bayar" name="max_bayar" value="Kredit" autocomplete="off" readonly>
 				        <h5 class="headnavigation">Sisa Bayar</h5>
                         <input class="textinput4" type="hidden" name="sisa" id="sisa" value="" autocomplete="off" readonly required>
-                        <input class="textinput4" type="text" name="sisa2" id="sisa2" value="" autocomplete="off" readonly required>
+                        <input class="textinput4 disabled" style="color: white;" type="text" name="sisa2" id="sisa2" value="" autocomplete="off" readonly required>
                         <p><h4 id="rpsisa" style="display:none;"></h4></p>
                         </div>
 						<div id="ifNo" style="display:block">
@@ -197,15 +218,25 @@ function tampil_datax(nonota){
                     </div> 
                     <div class="entryfield6">
                         <div class="detailpop">
-                        <h5 class="headnavigation">Sisa Nota jual (Rp.)</h5>
-    
+                        <label>Tenor (Hari)
+                        <input class="textinput4 itenor" type="text" value="" autocomplete="off" value="0"><h3 class="headnavigation" style="float:left; margin:10px 0px 0px 5px;"></h3></label><br>
+
+                        <label>Diskon (%)
+                        <input class="textinput4 idiskon" type="text" value="" autocomplete="off" value="0"><h3 class="headnavigation" style="float:left; margin:10px 0px 0px 5px;"></h3></label><br>
+
+                        <label>PPN (%)
+                        <input class="textinput4 ippn" type="text" value="" autocomplete="off" value="0"><h3 class="headnavigation" style="float:left; margin:10px 0px 0px 5px;"></h3></label><br>
+
+                        <!-- <h5 class="headnavigation">Sisa Nota jual (Rp.)</h5> -->
+                        <div class="inpt">
                         <p>Total Sisa: <input type="hidden" class="textinput4" id="totsis" readonly required><input type="text" class="textinput4" id="totsis2" readonly required></p>
                         &nbsp;<h4 id="rptotsisa" style="display:none;"></h4>
                         <br><br>
-						<h5 class="headnavigation">Nominal Bayar (Rp.)<redfont><i>(Harus diisi)</i></redfont></h5>
+						<h5 class="headnavigation">Jumlah Bayar (Rp.)<redfont><i>(Harus diisi)</i></redfont></h5>
 				        <input class="textinput4 " type="hidden" id="nominal_bayar" name="nominal_bayar" value="" autocomplete="off" value="0"><h3 class="headnavigation" style="float:left; margin:10px 0px 0px 5px;"></h3>
                         <!-- &nbsp;<h4 id="rpinp"></h4> -->
                         <input class="textinput4 " type="text" id="nominal_bayar1" name="" value="" autocomplete="off" value="0"><h3 class="headnavigation" style="float:left; margin:10px 0px 0px 5px;">
+                        </div>
                         <script type="text/javascript">
                             var cleave = new Cleave('#nominal_bayar1', {
                                 numeral: true,
@@ -313,7 +344,7 @@ function tampil_datax(nonota){
                                 <th>Tanggal</th>
                                 <th>Status</th>
                                 <th>Jumlah Bayar (Rp.)</th>
-                                <th>Sisa Bayar (Rp.)</th>
+                                <th>Sisa Nota (Rp.)</th>
                             </tr>
                         </thead>
                         <tbody class="tampil-dt">
@@ -327,7 +358,20 @@ function tampil_datax(nonota){
                         </script>
                     </table>
                     
-                    <div class="konfirmasi" style="">
+                    <div class="entryfield5">
+                       <br><br>
+                       <h5 class="headnavigation">Jumlah Sebelum Diskon Dari PPN</h5>
+                       <input class="textinput4" type="hidden" name="" id="nppn" value="" autocomplete="off" readonly>
+                       <input class="textinput4" type="hidden" name="totaljual" id="ppn" value="" autocomplete="off" readonly>
+                       <input type="hidden" id="nnppn">
+                       <input class="textinput4 disabled" style="color: white;" type="text" name="totaljual" id="ppn1" value="" autocomplete="off" readonly><br><hr>
+                       <h5 class="headnavigation">Jumlah Setelah Diskon Dari PPN</h5>
+                       <input class="textinput4" type="hidden" name="" id="ndiskon" value="" autocomplete="off" readonly>
+                       <input class="textinput4" type="hidden" name="totaljual" id="diskon" value="" autocomplete="off" readonly>
+                       <input class="textinput4 disabled" style="color: white;" type="text" name="totaljual" id="diskon1" value="" autocomplete="off" readonly><br><hr>
+                    </div>
+
+                    <div class="konfirmasi" style="position: absolute; margin-top: 450; margin-left: 950px;">
                         <input class="formsubmit boxsubmit sub" type="submit" name="" value="Bayar" disabled='disabled'>
                         <div class="formsubmitcancel" onclick="datalookup('dcctable'); datahide('detailentry');"><h5>BATAL</h5></div>
                     </div>
@@ -438,6 +482,10 @@ function tampil_datax(nonota){
                                     <button disabled='disabled' class="badge_status_non_aktif">Bayar</button>
                                     &nbsp;
                                     <a class="datalookup detail-nota"
+                                    total-jl="<?= $row['total'] ?>"
+                                    data-tenor="<?= $row['transaksi_tenor'] ?>"
+                                    data-ppn="<?= $row['transaksi_ppn'] ?>"
+                                    data-diskon="<?= $row['transaksi_diskon'] ?>"
                                     data-sisa="<?= number_format($sisa,2) ?>"
                                     data-nota="<?= $row['transaksi_nota'];?>" 
                                     data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
@@ -447,7 +495,11 @@ function tampil_datax(nonota){
                                     >Detail</a>
                                 <?php elseif ($status == 2) : ?>
                                     <!-- <button class="formsubmit1">Bayar</button> -->
-                                    <a class="formsubmit1 datalookup" 
+                                    <a class="formsubmit1 datalookup"
+                                    total-jl="<?= $row['total'] ?>" 
+                                    data-tenor="<?= $row['transaksi_tenor'] ?>"
+                                    data-ppn="<?= $row['transaksi_ppn'] ?>"
+                                    data-diskon="<?= $row['transaksi_diskon'] ?>"
                                     data-sisa="<?php echo $sisa; ?>"
                                     data-nota="<?= $row['transaksi_nota'];?>" 
                                     data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
