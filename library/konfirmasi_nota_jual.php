@@ -5,9 +5,9 @@
     $nonota = $_POST['nonota'];
 
     if($hasil == "terima"){
-        $hsl = 2;
+        $hsl = 1;
     }else{
-        $hsl = 3;
+        $hsl = 2;
     }
 
     $ubah = "UPDATE transaksi SET transaksi_proses='$hsl' WHERE transaksi_nota='$nonota'";

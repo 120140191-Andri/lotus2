@@ -54,15 +54,18 @@ $(document).ready(function(){
         $("#tgljual").val(tglnota);
         
         var totaljual = $(this).attr("total-jual");
+        var totaljl   = $(this).attr("total-jl");
         $("#totaljual").val(totaljual);
         
         var ppn      = $(this).attr("data-ppn");
-        var totppn   = parseInt(totaljual) * parseInt(ppn) / 100;
-        var hasilppn = parseInt(totaljual) - parseInt(totppn);
-        $("#ppn").val(parseFloat(totaljual));
-
-        var diskon = $(this).attr("data-diskon");
-        $("#diskon").val(diskon);
+        var totppn   = parseInt(totaljl) * parseInt(ppn) / 100;
+        var hasilppn = parseInt(totaljl) - parseInt(totppn);
+        $("#ppn").val(hasilppn);
+        
+        var diskon      = $(this).attr("data-diskon");
+        var hasildiskon = (diskon/100)*totaljl;
+        var totaldiskon = hasilppn - hasildiskon; 
+        $("#diskon").val(totaldiskon);
         
         var sisa = $(this).attr("data-sisa");
         $("#sisa").val(sisa);
@@ -129,6 +132,8 @@ function tampil_datax(nonota){
             });
             $('.tampil-dt').html(dt);
             $('#totaljual').val(formatRupiah($('#ttlhrg').val(), ""));
+            $('#ppn1').val(formatRupiah($('#ppn').val(), ""));
+            $("#diskon1").val(formatRupiah($('#diskon').val(), ""));
 		}
 	});
 
@@ -340,9 +345,11 @@ function tampil_datax(nonota){
                     <div class="entryfield5">
                        <br><br>
                        <h5 class="headnavigation">Jumlah Sebelum Diskon Dari PPN</h5>
-                       <input class="textinput4" type="text" name="totaljual" id="ppn" value="" autocomplete="off" readonly><br><hr>
+                       <input class="textinput4" type="hidden" name="totaljual" id="ppn" value="" autocomplete="off" readonly>
+                       <input class="textinput4" type="text" name="totaljual" id="ppn1" value="" autocomplete="off" readonly><br><hr>
                        <h5 class="headnavigation">Jumlah Setelah Diskon Dari PPN</h5>
-                       <input class="textinput4" type="text" name="totaljual" id="diskon" value="" autocomplete="off" readonly><br><hr>
+                       <input class="textinput4" type="hidden" name="totaljual" id="diskon" value="" autocomplete="off" readonly>
+                       <input class="textinput4" type="text" name="totaljual" id="diskon1" value="" autocomplete="off" readonly><br><hr>
                     </div> 
                         
                     <div class="konfirmasi" style="position: absolute; margin-top: 450;">
@@ -425,7 +432,7 @@ function tampil_datax(nonota){
                         <tbody>
                         <?php
                             // ( 1 * penjualan_jumlah) 1 = harga penjualan nanti
-                            $transaksi = mysqli_query($db,"SELECT *,( barang_harga * penjualan_jumlah ) AS total FROM penjualan INNER JOIN transaksi ON penjualan.transaksi_id=transaksi.transaksi_id INNER JOIN barang ON penjualan.barang_id=barang.barang_id WHERE transaksi_status='1' GROUP BY penjualan.transaksi_id");
+                            $transaksi = mysqli_query($db,"SELECT *,( barang_harga * penjualan_jumlah ) AS total FROM penjualan INNER JOIN transaksi ON penjualan.transaksi_id=transaksi.transaksi_id INNER JOIN barang ON penjualan.barang_id=barang.barang_id GROUP BY penjualan.transaksi_id");
                             $i = 0;
                             
                             while($row = mysqli_fetch_array($transaksi))
@@ -449,15 +456,15 @@ function tampil_datax(nonota){
 
                             <td style="width:8%;text-align:center;">
                              
-                            <?php if ($sts == 1) : ?>
+                            <?php if ($sts == 0) : ?>
 
                                 <span class='badge_status'>Belum Dikonfirmasi</span> 
                             
-                            <?php elseif ($sts == 2) : ?>
+                            <?php elseif ($sts == 1) : ?>
                             
                                 <span class='badge_status_aktif'>Dikonfirmasi</span> 
                             
-                            <?php elseif ($sts == 3) : ?>
+                            <?php elseif ($sts == 2) : ?>
 
                                 <span class='badge_status_non_aktif'>Ditolak</span>
 
@@ -469,13 +476,14 @@ function tampil_datax(nonota){
 
                             <td style="width:8%;text-align:center;">
 
-                                <?php if ($sts == 1) : ?>
+                                <?php if ($sts == 0) : ?>
                                     <a class="datalookup detail-nota badge_status_aktif"
                                     data-transaksi="<?= $row['transaksi_id'] ?>"
                                     data-sisa="<?= number_format($sisa,2) ?>"
                                     data-nota="<?= $row['transaksi_nota'];?>" 
                                     data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
                                     total-jual="<?php echo number_format($row['total'],2);?>"
+                                    total-jl="<?= $row['total'] ?>"
                                     operator="<?= nama_supplier($row['pelanggan_id']) ?>"
                                     detail="True"
                                     >Detail</a>
@@ -488,6 +496,7 @@ function tampil_datax(nonota){
                                     data-nota="<?= $row['transaksi_nota'];?>" 
                                     data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
                                     total-jual="<?php echo number_format($row['total'],2);?>"
+                                    total-jl="<?= $row['total'] ?>"
                                     operator="<?= nama_supplier($row['pelanggan_id']) ?>"
                                     detail="False"
                                     >Terima</a>
@@ -499,6 +508,7 @@ function tampil_datax(nonota){
                                     data-nota="<?= $row['transaksi_nota'];?>" 
                                     data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
                                     total-jual="<?php echo number_format($row['total'],2);?>"
+                                    total-jl="<?= $row['total'] ?>"
                                     operator="<?= nama_supplier($row['pelanggan_id']) ?>"
                                     detail="False"
                                     >Tolak</a>
@@ -511,6 +521,7 @@ function tampil_datax(nonota){
                                     data-nota="<?= $row['transaksi_nota'];?>" 
                                     data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
                                     total-jual="<?php echo number_format($row['total'],2);?>"
+                                    total-jl="<?= $row['total'] ?>"
                                     operator="<?= nama_supplier($row['pelanggan_id']) ?>"
                                     detail="True"
                                     >Detail</a>

@@ -203,24 +203,35 @@ function tampil_datax(nonota){
                         &nbsp;<h4 id="rptotsisa" style="display:none;"></h4>
                         <br><br>
 						<h5 class="headnavigation">Nominal Bayar (Rp.)<redfont><i>(Harus diisi)</i></redfont></h5>
-				        <input class="textinput4 " type="number" id="nominal_bayar" name="nominal_bayar" value="" autocomplete="off" value="0"><h3 class="headnavigation" style="float:left; margin:10px 0px 0px 5px;"></h3>
-                        &nbsp;<h4 id="rpinp"></h4>
+				        <input class="textinput4 " type="hidden" id="nominal_bayar" name="nominal_bayar" value="" autocomplete="off" value="0"><h3 class="headnavigation" style="float:left; margin:10px 0px 0px 5px;"></h3>
+                        <!-- &nbsp;<h4 id="rpinp"></h4> -->
+                        <input class="textinput4 " type="text" id="nominal_bayar1" name="" value="" autocomplete="off" value="0"><h3 class="headnavigation" style="float:left; margin:10px 0px 0px 5px;">
+                        <script type="text/javascript">
+                            var cleave = new Cleave('#nominal_bayar1', {
+                                numeral: true,
+                                numeralDecimalMark: 'thousand',
+                                delimiter: '.'
+                            });
+                        </script>
                         
                         <!-- validasi inputan -->
                         <script>
-                            $('#nominal_bayar').keyup(function () {
+                            $('#nominal_bayar1').keyup(function () {
             
-                                var dInput = $('#nominal_bayar').val();
+                                var dInput = $('#nominal_bayar1').val();
                                 var sisa = $('#sisa').val();
 
-                                var totsisa = parseInt(sisa - dInput);
+                                $('#nominal_bayar').val(dInput.split('.').join(''));
+
+                                var totsisa = parseInt(sisa) - parseInt(dInput.split('.').join(''));
 
                                 $('#totsis').val(totsisa);
 
-                                if(parseInt(dInput) > parseInt(sisa)){
+                                if(parseInt($('#nominal_bayar').val()) > parseInt(sisa)){
                                     alert("Nominal Tidak Boleh Lebih Dari Sisa");
                                     $('#totsis').val(0);
                                     $('#nominal_bayar').val(parseInt(sisa));
+                                    $('#nominal_bayar1').val(formatRupiah(sisa, ""));
                                 }
 
                                 if (dInput != "" && dInput != 0){
@@ -232,7 +243,7 @@ function tampil_datax(nonota){
                                 $('#totsis2').val(formatRupiah($('#totsis').val(), ""));
                                 $('#rpsisa').text(formatRupiah(sisa, "Rp:  "));
                                 $('#rptotsisa').text(formatRupiah($('#totsis').val(), "Rp:  "));
-                                $('#rpinp').text(formatRupiah(dInput, "Rp:  "));
+                                $('#rpinp').text(dInput);
 
                             });
                             
@@ -394,6 +405,7 @@ function tampil_datax(nonota){
                                 $sts = "Kredit";
                             }
 
+                            if ($row['transaksi_proses'] == 1) :
                         ?>  
                         <tr>
                             <td><?= $i ?></td>
@@ -460,6 +472,7 @@ function tampil_datax(nonota){
                             <!-- </td> -->
                         </tr>
                         <?php
+                            endif;
                             } 
                         ?>
                         </tbody> 
