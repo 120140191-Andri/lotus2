@@ -429,7 +429,7 @@ function tampil_datax(nonota){
                         <tbody>
                         <?php
                             // ( 1 * penjualan_jumlah) 1 = harga penjualan nanti
-                            $transaksi = mysqli_query($db,"SELECT *,( barang_harga * penjualan_jumlah ) AS total FROM penjualan INNER JOIN transaksi ON penjualan.transaksi_id=transaksi.transaksi_id INNER JOIN barang ON penjualan.barang_id=barang.barang_id");
+                            $transaksi = mysqli_query($db,"SELECT *,SUM( barang_harga * penjualan_jumlah ) AS total FROM penjualan INNER JOIN transaksi ON penjualan.transaksi_id=transaksi.transaksi_id INNER JOIN barang ON penjualan.barang_id=barang.barang_id GROUP BY transaksi.transaksi_id");
                             $i = 0;
 
                             while($row = mysqli_fetch_array($transaksi))

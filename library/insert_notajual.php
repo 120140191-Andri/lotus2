@@ -25,7 +25,7 @@
         $sts = "2";
     }
 
-        $sql = "INSERT INTO bayar_nota_jual (tgl_bayar,transaksi_id,jenis,jumlah,sisa,id_karyawan,pengirim_nama,pengirim_bank,pengirim_no,penerima_nama,penerima_bank,penerima_no,status) VALUES (now(),'$nobeli', '$jenis','$nominal','$sisa','','$rnamarim','$rbankrim','$rnorim','$rnamaima','$rbankima', '$rnoima','$st')";
+        $sql = "INSERT INTO bayar_nota_jual (tgl_bayar,transaksi_id,jenis,jumlah,sisa,id_karyawan,pengirim_nama,pengirim_bank,pengirim_no,penerima_nama,penerima_bank,penerima_no,status) VALUES (now(),'$nobeli', '$jenis','$nominal','$sisa','$userid','$rnamarim','$rbankrim','$rnorim','$rnamaima','$rbankima', '$rnoima','$st')";
 
         if(mysqli_multi_query($db, $sql))
         {

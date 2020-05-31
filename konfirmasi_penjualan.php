@@ -383,11 +383,11 @@ $(document).ready(function(){
                        <input class="textinput4" type="hidden" name="" id="nppn" value="" autocomplete="off" readonly>
                        <input class="textinput4" type="hidden" name="totaljual" id="ppn" value="" autocomplete="off" readonly>
                        <input type="hidden" id="nnppn">
-                       <input class="textinput4" type="text" name="totaljual" id="ppn1" value="" autocomplete="off" readonly><br><hr>
+                       <input class="textinput4 disabled" style="color: white;" type="text" name="totaljual" id="ppn1" value="" autocomplete="off" readonly><br><hr>
                        <h5 class="headnavigation">Jumlah Setelah Diskon Dari PPN</h5>
                        <input class="textinput4" type="hidden" name="" id="ndiskon" value="" autocomplete="off" readonly>
                        <input class="textinput4" type="hidden" name="totaljual" id="diskon" value="" autocomplete="off" readonly>
-                       <input class="textinput4" type="text" name="totaljual" id="diskon1" value="" autocomplete="off" readonly><br><hr>
+                       <input class="textinput4 disabled" style="color: white;" type="text" name="totaljual" id="diskon1" value="" autocomplete="off" readonly><br><hr>
                     </div> 
                     <!-- <script type="text/javascript">
                             var cleave = new Cleave('#ppn1', {
