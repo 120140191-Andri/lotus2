@@ -129,7 +129,7 @@ function tampil_datax(nonota){
                     <td style="text-align:center">`+ value.barang_id +`</td>
                     <td style="text-align:center">`+ value.barang_nama +`</td>
                     <td style="text-align:center" id="pjumlah">`+ value.penjualan_jumlah +` Frame</td>
-                    <td style="text-align:center"> <input type="number" min="0" class="inqty-`+value.penjualan_id+`" value="`+value.penjualan_jumlah+`"><input type="hidden" id="id_jual"> <a class="ubah-btn detail-nota badge_status_aktif konfir" data-idp="`+value.penjualan_id+`">Ubah</a></td>
+                    <td style="text-align:center"> <input type="number" min="0" class="inqty-`+value.penjualan_id+`" value="`+value.penjualan_jumlah+`"><input type="hidden" id="id_jual"> <a style="cursor:pointer;" class="ubah-btn detail-nota badge_status_aktif konfir" data-idp="`+value.penjualan_id+`">Ubah</a></td>
                     <td style="text-align:center">`+ formatRupiah(value.barang_harga, "Rp:") +`</td>
                 </tr>`;
                 
@@ -397,7 +397,7 @@ $(document).ready(function(){
                             });
                     </script> -->
                         
-                    <div class="konfirmasi" style="position: absolute; margin-top: 450; margin-left: 950px;">
+                    <div class="konfirmasi" style="position: absolute; margin-top: 450; margin-left: 850px;">
                         <a class="formsubmit boxsubmit badge_status_aktif konfir" id="terima" >Terima</a>
                         <a class="formsubmit boxsubmit badge_status_non_aktif konfir" id="tolak" >Tolak</a>
                         <div class="formsubmitcancel" onclick="datalookup('dcctable'); datahide('detailentry');"><h5>Kembali</h5></div>

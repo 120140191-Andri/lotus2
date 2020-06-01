@@ -371,7 +371,7 @@ function tampil_datax(nonota){
                        <input class="textinput4 disabled" style="color: white;" type="text" name="totaljual" id="diskon1" value="" autocomplete="off" readonly><br><hr>
                     </div>
 
-                    <div class="konfirmasi" style="position: absolute; margin-top: 450; margin-left: 950px;">
+                    <div class="konfirmasi" style="position: absolute; margin-top: 450; margin-left: 850px;">
                         <input class="formsubmit boxsubmit sub" type="submit" name="" value="Bayar" disabled='disabled'>
                         <div class="formsubmitcancel" onclick="datalookup('dcctable'); datahide('detailentry');"><h5>BATAL</h5></div>
                     </div>
