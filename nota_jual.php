@@ -13,12 +13,15 @@
     <link rel="stylesheet" type="text/css" href="css/solid.css">
     <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="css/select2.css">
-    
+    <link rel="stylesheet" href="asset/css/bootstrap.min.css"> 
+
     <script type="text/javascript" src="script/jquery.js"></script>
     <script type="text/javascript" src="script/cleave.min.js"></script>
     <script type="text/javascript" src="script/script.js"></script>
     <script type="text/javascript" src="script/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="script/select2.js"></script>
+    <script src="asset/js/popper.min.js"></script> 
+    <script type="text/javascript" src="asset/js/bootstrap.min.js"></script>
     <style>
         .disabled{
             background-color:grey;
@@ -58,20 +61,41 @@ $(document).ready(function(){
         var totaljual = $(this).attr("total-jual");
         var totaljl   = $(this).attr("total-jl");
         $("#totaljual").val(totaljual);
+        $('#ttlhrg').val(totaljl);
+
+        // var ppn      = $(this).attr("data-ppn");
+        // var totppn   = parseInt(totaljl) * parseInt(ppn) / 100;
+        // var hasilppn = parseInt(totaljl) - parseInt(totppn);
+        // $("#nppn").val(ppn);
+        // $("#ppn").val(hasilppn);
+        // $("#ppn1").val(formatRupiah($("#ppn").val()));
         
-        var ppn      = $(this).attr("data-ppn");
-        var totppn   = parseInt(totaljl) * parseInt(ppn) / 100;
-        var hasilppn = parseInt(totaljl) - parseInt(totppn);
-        $("#nppn").val(ppn);
-        $("#ppn").val(hasilppn);
-        $("#ppn1").val(formatRupiah($("#ppn").val()));
-        
+        // var diskon      = $(this).attr("data-diskon");
+        // var hasildiskon = (diskon/100)*totaljl;
+        // var totaldiskon = hasilppn - hasildiskon; 
+        // $("#ndiskon").val(diskon);
+        // $("#diskon").val(totaldiskon);
+        // $("#diskon1").val(formatRupiah($("#diskon").val()));
+
         var diskon      = $(this).attr("data-diskon");
-        var hasildiskon = (diskon/100)*totaljl;
-        var totaldiskon = hasilppn - hasildiskon; 
-        $("#ndiskon").val(diskon);
+        // var hasildiskon = (diskon/100)*totaljl;
+        // var totaldiskon = hasilppn - hasildiskon;
+        var totaldiskon = totaljl - (totaljl*(diskon/100)); 
+        $("#ndiskon").val(totaldiskon);
         $("#diskon").val(totaldiskon);
-        $("#diskon1").val(formatRupiah($("#diskon").val()));
+        // alert(totaldiskon);
+        $("#diskon1").val(totaldiskon);
+        $("#diskon1").val(formatRupiah($('#diskon1').val(), ""));
+
+        var ppn = $(this).attr("data-ppn");
+        // var totppn   = parseInt(totaljl) * parseInt(ppn) / 100;
+        // var hasilppn = parseInt(totaljl) - parseInt(totppn);
+        var hasilppn = totaldiskon + (totaldiskon*(ppn/100));
+        $("#nppn").val(hasilppn);
+        $("#ppn").val(hasilppn);
+        // alert(hasilppn);
+        $('#ppn1').val(hasilppn);
+        $('#ppn1').val(formatRupiah($('#ppn1').val(), ""));
 
         var tenor = $(this).attr("data-tenor");
         $('.itenor').val(tenor);
@@ -127,6 +151,7 @@ function tampil_datax(nonota){
 		success: function(respon) {
 			var dat = JSON.parse(respon);
             var i = 0;
+            var ttl = 0;
             $.each(dat, function(key,value) {
                 i ++;
                 dt += 
@@ -136,6 +161,11 @@ function tampil_datax(nonota){
                     <td style="text-align:center">`+ value.st +`</td>
                     <td style="text-align:center">`+ formatRupiah(value.nominal, "Rp:") +`</td>
                     <td style="text-align:center">`+ formatRupiah(value.sisa, "Rp:") +`</td>
+                    <td style="text-align:center">
+                        <a class="btn btn-primary editdt" data-toggle="modal" data-editsisa="`+ value.sisa +`" data-editnominal="`+ value.nominal +`" data-editid="`+ value.idb +`" data-target="#Modaledit">Edit</a>
+                        &nbsp;
+                        <a class="btn btn-danger hpsdt" data-hpsid="`+ value.idb +`">Hapus</a>
+                    </td>
                 </tr>`;
             
             });
@@ -145,10 +175,143 @@ function tampil_datax(nonota){
 
 }
 </script>
+<!-- hapus bayar -->
+<script>
+    $(document).ready(function(){
+        $('.tampil-dt').on('click', '.hpsdt', function(){
+            var idb = $(this).attr('data-hpsid');
+            $.ajax({
+                type: 'POST',
+                url: "library/hapus_bayar.php",
+                data: {
+                    idb: idb,
+                },
+                success: function(respon) {
+                    alert(respon);
+                    window.location.href = 'nota_jual.php';        
+                }
+            });
+        });
+    });
+</script>
+
+<!-- edit bayar -->
+<script>
+    $(document).ready(function(){
+        $('.tampil-dt').on('click', '.editdt', function(){
+            var idb  = $(this).attr('data-editid');
+            var sisa = $(this).attr('data-editsisa');
+            // var sisa = $('#sisa').val();
+            var nom  = $(this).attr('data-editnominal');
+            var max  = $("#ttlhrg").val() - nom;
+
+            $('#edtsisabayar').val(parseInt(sisa.split('.').join('')) + parseInt(nom));
+            $('#edtsisabayar1').val(formatRupiah($("#edtsisabayar").val()));
+
+
+            $('#edtnominal').val(nom);
+            $('#edtnominalbef').val(nom);
+            $('#edtnominal1').val(formatRupiah($("#edtnominal").val()));
+            
+            $('.idb').val(idb);
+        });
+    });
+</script>
 
 <title>Lotus - Nota jual</title>
 
 <body>
+    <!-- Modal -->
+	<div id="Modaledit" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- konten modal-->
+			<div class="modal-content">
+				<!-- heading modal -->
+				<div class="modal-header">
+                    <h4 class="modal-title">Edit Nominal Bayar</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<!-- body modal -->
+				<div class="modal-body">
+                   <input type="hidden" class="idb">
+                   <div class="form-group">
+                        <label for="exampleInputEmail1">Sisa</label>
+                        <input type="hidden" class="form-control" id="edtsisabayar" aria-describedby="emailHelp" readonly>
+                        <input type="text" class="form-control" id="edtsisabayar1" aria-describedby="emailHelp" readonly>
+                        <small id="emailHelp" class="form-text text-muted">Sisa Bayar Dalam (Rp) Nominal Bayar Tidak Boleh Lebih Dari Sisa Bayar!</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Nominal</label>
+                        <input type="hidden" class="form-control" id="edtnominalbef" placeholder="Nominal Bayar">
+                        <input type="hidden" class="form-control" id="edtnominal" placeholder="Nominal Bayar">
+                        <input type="text" class="form-control" id="edtnominal1" placeholder="Nominal Bayar">
+                        <small id="notif" style="display: none; color: Red;" class="form-text text-muted alert alert-danger">Nominal Melebihi Batas Maksimal, Nominal Dikembalikan ke Batas Maksimal</small>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <button class="btn btn-primary ubahbayar">Ubah</button>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        $('.ubahbayar').click(function(){
+                            var idbayar  = $('.idb').val();
+                            var sisaedit = $('#edtsisabayar').val();
+                            // var sisaedit = $('#sisa').val();
+                            var nomedit  = $('#edtnominal').val();
+                            var nombef   = $('#edtnominalbef').val();
+                            $.ajax({
+                                type: 'POST',
+                                url: "library/ubah_bayar.php",
+                                data: {
+                                    idb: idbayar,
+                                    sisa: sisaedit,
+                                    nominal: nomedit,
+                                    nombef: nombef
+                                },
+                                success: function(respon) {
+                                    alert(respon);
+                                    window.location.href = 'nota_jual.php';        
+                                }
+                            });
+                        });
+
+                        var cleave = new Cleave('#edtnominal1', {
+                            numeral: true,
+                            numeralDecimalMark: 'thousand',
+                            delimiter: '.'
+                        });
+                        // $('#edtnominal').val(nom);
+                        $('#edtnominal1').keyup(function () {
+                            var edtnom     = $('#edtnominal').val();
+                            var inptedtnom = $('#edtnominal1').val();
+                            var sisaedt    = $('#edtsisabayar').val();
+                            var insisaedt  = $('#edtsisabayar1').val();
+
+                            $('#edtnominal').val(inptedtnom.split('.').join(''));
+                            
+                            if (parseInt(inptedtnom.split('.').join('')) > parseInt(sisaedt)){
+                                // alert("Nominal Tidak Boleh Lebih Dari" + insisaedt);
+                                $('#edtnominal1').val(insisaedt);
+                                $('#edtnominal').val(sisaedt);
+                                $('#notif').show();
+                            }
+
+                            if ($('#edtnominal1').val() != "" && $('#edtnominal1').val() != "0"){
+                                $('.ubahbayar').prop('disabled', false);
+                            }else{
+                                $('.ubahbayar').prop('disabled', true);
+                            }
+
+                        });
+                    </script>
+				</div>
+				<!-- footer modal -->
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+				</div>
+			</div>
+		</div>
+	</div>
     <div class="spacer"> </div>
     
     <?php
@@ -345,6 +508,7 @@ function tampil_datax(nonota){
                                 <th>Status</th>
                                 <th>Jumlah Bayar (Rp.)</th>
                                 <th>Sisa Nota (Rp.)</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="tampil-dt">
@@ -356,25 +520,31 @@ function tampil_datax(nonota){
                                 });
                             });
                         </script>
+                        <input type="hidden" id="ttlhrg" value="">
                     </table>
                     
                     <div class="entryfield5">
                        <br><br>
-                       <h5 class="headnavigation">Jumlah Sebelum Diskon Dari PPN</h5>
+                       <!-- form ppn -->
+                       <!-- <h5 class="headnavigation">Jumlah Sebelum Diskon Dari PPN</h5> -->
                        <input class="textinput4" type="hidden" name="" id="nppn" value="" autocomplete="off" readonly>
                        <input class="textinput4" type="hidden" name="totaljual" id="ppn" value="" autocomplete="off" readonly>
                        <input type="hidden" id="nnppn">
-                       <input class="textinput4 disabled" style="color: white;" type="text" name="totaljual" id="ppn1" value="" autocomplete="off" readonly><br><hr>
+                       <!-- dibawah ppn yang di hide/munculkan -->
+                       <input class="textinput4" type="hidden" name="totaljual" id="ppn1" value="" autocomplete="off" readonly><br><hr>
                        <h5 class="headnavigation">Jumlah Setelah Diskon Dari PPN</h5>
+                       
+                       <!-- form diskon -->
                        <input class="textinput4" type="hidden" name="" id="ndiskon" value="" autocomplete="off" readonly>
                        <input class="textinput4" type="hidden" name="totaljual" id="diskon" value="" autocomplete="off" readonly>
-                       <input class="textinput4 disabled" style="color: white;" type="text" name="totaljual" id="diskon1" value="" autocomplete="off" readonly><br><hr>
+                       <input class="textinput4" type="text" name="totaljual" id="diskon1" value="" autocomplete="off" readonly><br><hr>
                     </div>
+                    <br>
+                    <div class="konfirmasi" style="position: absolute; margin-top: 600; margin-left: 900px;">
+                        <input class="formsubmit boxsubmit sub btn" type="submit" name="" value="Bayar" disabled='disabled'>
+                        <div class="formsubmitcancel btn" onclick="datalookup('dcctable'); datahide('detailentry');"><h5>BATAL</h5></div>
 
-                    <div class="konfirmasi" style="position: absolute; margin-top: 450; margin-left: 850px;">
-                        <input class="formsubmit boxsubmit sub" type="submit" name="" value="Bayar" disabled='disabled'>
-                        <div class="formsubmitcancel" onclick="datalookup('dcctable'); datahide('detailentry');"><h5>BATAL</h5></div>
-                    </div>
+                                       </div>
                     <script>
                         $('.formsubmitcancel').click(function(){
                             window.location.href = 'nota_jual.php';  
@@ -478,37 +648,49 @@ function tampil_datax(nonota){
 
                             <td style="width:8%;text-align:center;">
 
-                                <?php if ($status == 1) : ?>
-                                    <button disabled='disabled' class="badge_status_non_aktif">Bayar</button>
-                                    &nbsp;
-                                    <a class="datalookup detail-nota"
-                                    total-jl="<?= $row['total'] ?>"
-                                    data-tenor="<?= $row['transaksi_tenor'] ?>"
-                                    data-ppn="<?= $row['transaksi_ppn'] ?>"
-                                    data-diskon="<?= $row['transaksi_diskon'] ?>"
-                                    data-sisa="<?= number_format($sisa,2) ?>"
-                                    data-nota="<?= $row['transaksi_nota'];?>" 
-                                    data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
-                                    total-jual="<?php echo number_format($row['total'],2);?>"
-                                    operator="<?= nama_supplier($row['pelanggan_id']) ?>"
-                                    detail="True"
-                                    >Detail</a>
-                                <?php elseif ($status == 2) : ?>
-                                    <!-- <button class="formsubmit1">Bayar</button> -->
-                                    <a class="formsubmit1 datalookup"
-                                    total-jl="<?= $row['total'] ?>" 
-                                    data-tenor="<?= $row['transaksi_tenor'] ?>"
-                                    data-ppn="<?= $row['transaksi_ppn'] ?>"
-                                    data-diskon="<?= $row['transaksi_diskon'] ?>"
-                                    data-sisa="<?php echo $sisa; ?>"
-                                    data-nota="<?= $row['transaksi_nota'];?>" 
-                                    data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
-                                    total-jual="<?php echo number_format($row['total'],2);?>"
-                                    operator="<?= nama_supplier($row['pelanggan_id']) ?>"><h5>Bayar</h5>
-                                    </a>
-                                    &nbsp;
-                                    <a disabled='disabled'>Detail</a>
-                                <?php endif; ?>
+                                <button
+                                    class="btn btn-primary dropdown-toggle"
+                                    type="button"
+                                    id="dropdownMenuButton"
+                                    data-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    aria-expanded="false">
+                                    Aksi
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="padding: 15px;">
+                                    <?php if ($status == 1) : ?>
+                                        <button disabled='disabled' class="badge_status_non_aktif btn">Bayar</button>
+                                        &nbsp;
+                                        <a class="datalookup detail-nota btn btn-primary"
+                                        total-jl="<?= $row['total'] ?>"
+                                        data-tenor="<?= $row['transaksi_tenor'] ?>"
+                                        data-ppn="<?= $row['transaksi_ppn'] ?>"
+                                        data-diskon="<?= $row['transaksi_diskon'] ?>"
+                                        data-sisa="<?= number_format($sisa,2) ?>"
+                                        data-nota="<?= $row['transaksi_nota'];?>" 
+                                        data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
+                                        total-jual="<?php echo number_format($row['total'],2);?>"
+                                        operator="<?= nama_supplier($row['pelanggan_id']) ?>"
+                                        detail="True"
+                                        >Detail</a>
+                                    <?php elseif ($status == 2) : ?>
+                                        <!-- <button class="formsubmit1">Bayar</button> -->
+                                        <button style="color:white;" class="formsubmit1 datalookup btn btn-primary"
+                                        total-jl="<?= $row['total'] ?>" 
+                                        data-tenor="<?= $row['transaksi_tenor'] ?>"
+                                        data-ppn="<?= $row['transaksi_ppn'] ?>"
+                                        data-diskon="<?= $row['transaksi_diskon'] ?>"
+                                        data-sisa="<?php echo $sisa; ?>"
+                                        data-nota="<?= $row['transaksi_nota'];?>" 
+                                        data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
+                                        total-jual="<?php echo number_format($row['total'],2);?>"
+                                        operator="<?= nama_supplier($row['pelanggan_id']) ?>">Bayar
+                                        </button>
+                                        &nbsp;
+                                        <a disabled='disabled' class="btn btn-secondary disabled badge_status_non_aktif">Detail</a>
+                                    <?php endif; ?>
+                                </div>
+                                
 
                             </td>
                             <!-- <td style="width:8%;text-align:center;">
