@@ -13,12 +13,16 @@
     <link rel="stylesheet" type="text/css" href="css/solid.css">
     <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="css/select2.css">
+    <link rel="stylesheet" href="asset/css/bootstrap.min.css"> 
     
     <script type="text/javascript" src="script/jquery.js"></script>
     <script type="text/javascript" src="script/cleave.min.js"></script>
     <script type="text/javascript" src="script/script.js"></script>
     <script type="text/javascript" src="script/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="script/select2.js"></script>
+    <script src="asset/js/popper.min.js"></script> 
+    <script type="text/javascript" src="asset/js/bootstrap.min.js"></script>
+    <style>
     <style>
         .disabled{
             background-color:grey;
@@ -57,17 +61,25 @@ $(document).ready(function(){
         var totaljl   = $(this).attr("total-jl");
         $("#totaljual").val(totaljual);
         
-        var ppn      = $(this).attr("data-ppn");
-        var totppn   = parseInt(totaljl) * parseInt(ppn) / 100;
-        var hasilppn = parseInt(totaljl) - parseInt(totppn);
-        $("#nppn").val(ppn);
-        $("#ppn").val(hasilppn);
-        
         var diskon      = $(this).attr("data-diskon");
-        var hasildiskon = (diskon/100)*totaljl;
-        var totaldiskon = hasilppn - hasildiskon; 
-        $("#ndiskon").val(diskon);
+        // var hasildiskon = (diskon/100)*totaljl;
+        // var totaldiskon = hasilppn - hasildiskon;
+        var totaldiskon = totaljl - (totaljl*(diskon/100)); 
+        $("#ndiskon").val(totaldiskon);
         $("#diskon").val(totaldiskon);
+        // alert(totaldiskon);
+        $("#diskon1").val(totaldiskon);
+        $("#diskon1").val(formatRupiah($('#diskon1').val(), ""));
+
+        var ppn = $(this).attr("data-ppn");
+        // var totppn   = parseInt(totaljl) * parseInt(ppn) / 100;
+        // var hasilppn = parseInt(totaljl) - parseInt(totppn);
+        var hasilppn = totaldiskon + (totaldiskon*(ppn/100));
+        $("#nppn").val(hasilppn);
+        $("#ppn").val(hasilppn);
+        // alert(hasilppn);
+        $('#ppn1').val(hasilppn);
+        $('#ppn1').val(formatRupiah($('#ppn1').val(), ""));
 
         var tenor = $(this).attr("data-tenor");
         $('.itenor').val(tenor);
@@ -129,7 +141,7 @@ function tampil_datax(nonota){
                     <td style="text-align:center">`+ value.barang_id +`</td>
                     <td style="text-align:center">`+ value.barang_nama +`</td>
                     <td style="text-align:center" id="pjumlah">`+ value.penjualan_jumlah +` Frame</td>
-                    <td style="text-align:center"> <input type="number" min="0" class="inqty-`+value.penjualan_id+`" value="`+value.penjualan_jumlah+`"><input type="hidden" id="id_jual"> <a style="cursor:pointer;" class="ubah-btn detail-nota badge_status_aktif konfir" data-idp="`+value.penjualan_id+`">Ubah</a></td>
+                    <td style="text-align:center"> <input type="number" min="0" class="inqty-`+value.penjualan_id+`" value="`+value.penjualan_jumlah+`"><input type="hidden" id="id_jual"> <a style="color: white;" class="ubah-btn detail-nota badge_status_aktif konfir btn-primary" data-idp="`+value.penjualan_id+`">Ubah</a></td>
                     <td style="text-align:center">`+ formatRupiah(value.barang_harga, "Rp:") +`</td>
                 </tr>`;
                 
@@ -138,15 +150,18 @@ function tampil_datax(nonota){
             $('.tampil-dt').html(dt);
             $('#totaljual').val(formatRupiah($('#ttlhrg').val(), ""));
             
-            var totppn   = parseInt($('#ttlhrg').val()) * parseInt($('#nppn').val()) / 100;
-            var hasilppn = parseInt($('#ttlhrg').val()) - parseInt(totppn);
-            $('#ppn1').val(hasilppn);
-            $('#ppn1').val(formatRupiah($('#ppn1').val(), ""));
+            // var hasildiskon = ($("#ndiskon").val()/100)*parseInt($('#ttlhrg').val());
+            // var totaldiskon = hasilppn - hasildiskon;
+            var totaldiskon = $("#nppn").val(hasilppn);
+            // $("#diskon1").val(totaldiskon);
+            // $("#diskon1").val(formatRupiah($('#diskon1').val(), ""));
             
-            var hasildiskon = ($("#ndiskon").val()/100)*parseInt($('#ttlhrg').val());
-            var totaldiskon = hasilppn - hasildiskon; 
-            $("#diskon1").val(totaldiskon);
-            $("#diskon1").val(formatRupiah($('#diskon1').val(), ""));
+            // var totppn   = parseInt($('#ttlhrg').val()) * parseInt($('#nppn').val()) / 100;
+            // var hasilppn = parseInt($('#ttlhrg').val()) - parseInt(totppn);
+            var hasilppn = $("#nppn").val(hasilppn);
+            // $('#ppn1').val(33);
+            // $('#ppn1').val(formatRupiah($('#ppn1').val(), ""));
+            
 		}
 	});
 
@@ -379,15 +394,19 @@ $(document).ready(function(){
 
                     <div class="entryfield5">
                        <br><br>
-                       <h5 class="headnavigation">Jumlah Sebelum Diskon Dari PPN</h5>
+                       <!-- form ppn -->
+                       <!-- <h5 class="headnavigation">Jumlah Sebelum Diskon Dari PPN</h5> -->
                        <input class="textinput4" type="hidden" name="" id="nppn" value="" autocomplete="off" readonly>
                        <input class="textinput4" type="hidden" name="totaljual" id="ppn" value="" autocomplete="off" readonly>
                        <input type="hidden" id="nnppn">
-                       <input class="textinput4 disabled" style="color: white;" type="text" name="totaljual" id="ppn1" value="" autocomplete="off" readonly><br><hr>
+                       <!-- dibawah ppn yang di hide/munculkan -->
+                       <input class="textinput4" type="hidden" name="totaljual" id="ppn1" value="" autocomplete="off" readonly><br><hr>
                        <h5 class="headnavigation">Jumlah Setelah Diskon Dari PPN</h5>
+                       
+                       <!-- form diskon -->
                        <input class="textinput4" type="hidden" name="" id="ndiskon" value="" autocomplete="off" readonly>
                        <input class="textinput4" type="hidden" name="totaljual" id="diskon" value="" autocomplete="off" readonly>
-                       <input class="textinput4 disabled" style="color: white;" type="text" name="totaljual" id="diskon1" value="" autocomplete="off" readonly><br><hr>
+                       <input class="textinput4" type="text" name="totaljual" id="diskon1" value="" autocomplete="off" readonly><br><hr>
                     </div> 
                     <!-- <script type="text/javascript">
                             var cleave = new Cleave('#ppn1', {
@@ -397,9 +416,9 @@ $(document).ready(function(){
                             });
                     </script> -->
                         
-                    <div class="konfirmasi" style="position: absolute; margin-top: 450; margin-left: 850px;">
-                        <a class="formsubmit boxsubmit badge_status_aktif konfir" id="terima" >Terima</a>
-                        <a class="formsubmit boxsubmit badge_status_non_aktif konfir" id="tolak" >Tolak</a>
+                    <div class="konfirmasi" style="position: absolute; margin-top: 500; margin-left: 850px;">
+                        <a class="formsubmit boxsubmit badge_status_aktif konfir btn-success" id="terima" >Terima</a>
+                        <a class="formsubmit boxsubmit badge_status_non_aktif konfir btn-danger" id="tolak" >Tolak</a>
                         <div class="formsubmitcancel" onclick="datalookup('dcctable'); datahide('detailentry');"><h5>Kembali</h5></div>
                     </div>
 
@@ -521,65 +540,76 @@ $(document).ready(function(){
 
                             <td style="width:8%;text-align:center;">
 
-                                <?php if ($sts == 0) : ?>
-                                    <a class="datalookup detail-nota badge_status_aktif"
-                                    data-tenor="<?= $row['transaksi_tenor'] ?>"
-                                    data-ppn="<?= $row['transaksi_ppn'] ?>"
-                                    data-diskon="<?= $row['transaksi_diskon'] ?>"
-                                    data-transaksi="<?= $row['transaksi_id'] ?>"
-                                    data-sisa="<?= number_format($sisa,2) ?>"
-                                    data-nota="<?= $row['transaksi_nota'];?>" 
-                                    data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
-                                    total-jual="<?php echo number_format($row['total'],2);?>"
-                                    total-jl="<?= $row['total'] ?>"
-                                    operator="<?= nama_supplier($row['pelanggan_id']) ?>"
-                                    detail="True"
-                                    >Detail</a>
-                                    &nbsp;
-                                    <a class="datalookup detail-nota badge_status_aktif"
-                                    data-tenor="<?= $row['transaksi_tenor'] ?>"
-                                    data-ppn="<?= $row['transaksi_ppn'] ?>"
-                                    data-diskon="<?= $row['transaksi_diskon'] ?>"
-                                    data-transaksi="<?= $row['transaksi_id'] ?>"
-                                    data-sisa="<?= number_format($sisa,2) ?>"
-                                    data-nota="<?= $row['transaksi_nota'];?>" 
-                                    data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
-                                    total-jual="<?php echo number_format($row['total'],2);?>"
-                                    total-jl="<?= $row['total'] ?>"
-                                    operator="<?= nama_supplier($row['pelanggan_id']) ?>"
-                                    detail="False"
-                                    >Terima</a>
-                                    <a class="datalookup detail-nota badge_status_non_aktif"
-                                    data-tenor="<?= $row['transaksi_tenor'] ?>"
-                                    data-ppn="<?= $row['transaksi_ppn'] ?>"
-                                    data-diskon="<?= $row['transaksi_diskon'] ?>"
-                                    data-transaksi="<?= $row['transaksi_id'] ?>"
-                                    data-sisa="<?= number_format($sisa,2) ?>"
-                                    data-nota="<?= $row['transaksi_nota'];?>" 
-                                    data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
-                                    total-jual="<?php echo number_format($row['total'],2);?>"
-                                    total-jl="<?= $row['total'] ?>"
-                                    operator="<?= nama_supplier($row['pelanggan_id']) ?>"
-                                    detail="False"
-                                    >Tolak</a>
-                                <?php else : ?>
-                                    <a class="datalookup detail-nota badge_status_aktif"
-                                    data-tenor="<?= $row['transaksi_tenor'] ?>"
-                                    data-ppn="<?= $row['transaksi_ppn'] ?>"
-                                    data-diskon="<?= $row['transaksi_diskon'] ?>"
-                                    data-transaksi="<?= $row['transaksi_id'] ?>"
-                                    data-sisa="<?= number_format($sisa,2) ?>"
-                                    data-nota="<?= $row['transaksi_nota'];?>" 
-                                    data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
-                                    total-jual="<?php echo number_format($row['total'],2);?>"
-                                    total-jl="<?= $row['total'] ?>"
-                                    operator="<?= nama_supplier($row['pelanggan_id']) ?>"
-                                    detail="True"
-                                    >Detail</a>
-                                    &nbsp;
-                                    <a class="badge_status_aktif disabled" disabled='disabled'>Terima</a>
-                                    <a class="badge_status_non_aktif disabled" disabled='disabled'>Tolak</a>
-                                <?php endif; ?>
+                                <button
+                                    class="btn btn-primary dropdown-toggle"
+                                    type="button"
+                                    id="dropdownMenuButton"
+                                    data-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    aria-expanded="false">
+                                    Aksi
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="padding: 15px;">
+                                    <?php if ($sts == 0) : ?>
+                                        <a style="color: white;" class="datalookup detail-nota badge_status_aktif btn-primary"
+                                        data-tenor="<?= $row['transaksi_tenor'] ?>"
+                                        data-ppn="<?= $row['transaksi_ppn'] ?>"
+                                        data-diskon="<?= $row['transaksi_diskon'] ?>"
+                                        data-transaksi="<?= $row['transaksi_id'] ?>"
+                                        data-sisa="<?= number_format($sisa,2) ?>"
+                                        data-nota="<?= $row['transaksi_nota'];?>" 
+                                        data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
+                                        total-jual="<?php echo number_format($row['total'],2);?>"
+                                        total-jl="<?= $row['total'] ?>"
+                                        operator="<?= nama_supplier($row['pelanggan_id']) ?>"
+                                        detail="True"
+                                        >Detail</a>
+                                        &nbsp;
+                                        <a style="color: white;" class="datalookup detail-nota badge_status_aktif btn-success"
+                                        data-tenor="<?= $row['transaksi_tenor'] ?>"
+                                        data-ppn="<?= $row['transaksi_ppn'] ?>"
+                                        data-diskon="<?= $row['transaksi_diskon'] ?>"
+                                        data-transaksi="<?= $row['transaksi_id'] ?>"
+                                        data-sisa="<?= number_format($sisa,2) ?>"
+                                        data-nota="<?= $row['transaksi_nota'];?>" 
+                                        data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
+                                        total-jual="<?php echo number_format($row['total'],2);?>"
+                                        total-jl="<?= $row['total'] ?>"
+                                        operator="<?= nama_supplier($row['pelanggan_id']) ?>"
+                                        detail="False"
+                                        >Terima</a>
+                                        <a style="color: white;" class="datalookup detail-nota badge_status_non_aktif btn-danger"
+                                        data-tenor="<?= $row['transaksi_tenor'] ?>"
+                                        data-ppn="<?= $row['transaksi_ppn'] ?>"
+                                        data-diskon="<?= $row['transaksi_diskon'] ?>"
+                                        data-transaksi="<?= $row['transaksi_id'] ?>"
+                                        data-sisa="<?= number_format($sisa,2) ?>"
+                                        data-nota="<?= $row['transaksi_nota'];?>" 
+                                        data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
+                                        total-jual="<?php echo number_format($row['total'],2);?>"
+                                        total-jl="<?= $row['total'] ?>"
+                                        operator="<?= nama_supplier($row['pelanggan_id']) ?>"
+                                        detail="False"
+                                        >Tolak</a>
+                                    <?php else : ?>
+                                        <a style="color: white;" class="datalookup detail-nota badge_status_aktif btn-primary"
+                                        data-tenor="<?= $row['transaksi_tenor'] ?>"
+                                        data-ppn="<?= $row['transaksi_ppn'] ?>"
+                                        data-diskon="<?= $row['transaksi_diskon'] ?>"
+                                        data-transaksi="<?= $row['transaksi_id'] ?>"
+                                        data-sisa="<?= number_format($sisa,2) ?>"
+                                        data-nota="<?= $row['transaksi_nota'];?>" 
+                                        data-tgl="<?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?>"
+                                        total-jual="<?php echo number_format($row['total'],2);?>"
+                                        total-jl="<?= $row['total'] ?>"
+                                        operator="<?= nama_supplier($row['pelanggan_id']) ?>"
+                                        detail="True"
+                                        >Detail</a>
+                                        &nbsp;
+                                        <a class="badge_status_aktif disabled btn-secondary" disabled='disabled'>Terima</a>
+                                        <a class="badge_status_non_aktif disabled btn-secondary" disabled='disabled'>Tolak</a>
+                                    <?php endif; ?>
+                                </div>
 
                             </td>
                             <!-- <td style="width:8%;text-align:center;">
