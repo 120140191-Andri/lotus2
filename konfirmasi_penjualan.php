@@ -65,7 +65,7 @@ $(document).ready(function(){
         // var hasildiskon = (diskon/100)*totaljl;
         // var totaldiskon = hasilppn - hasildiskon;
         var totaldiskon = totaljl - (totaljl*(diskon/100)); 
-        $("#ndiskon").val(totaldiskon);
+        $("#ndiskon").val(diskon);
         $("#diskon").val(totaldiskon);
         // alert(totaldiskon);
         $("#diskon1").val(totaldiskon);
@@ -75,7 +75,7 @@ $(document).ready(function(){
         // var totppn   = parseInt(totaljl) * parseInt(ppn) / 100;
         // var hasilppn = parseInt(totaljl) - parseInt(totppn);
         var hasilppn = totaldiskon + (totaldiskon*(ppn/100));
-        $("#nppn").val(hasilppn);
+        $("#nppn").val(ppn);
         $("#ppn").val(hasilppn);
         // alert(hasilppn);
         $('#ppn1').val(hasilppn);
@@ -152,15 +152,17 @@ function tampil_datax(nonota){
             
             // var hasildiskon = ($("#ndiskon").val()/100)*parseInt($('#ttlhrg').val());
             // var totaldiskon = hasilppn - hasildiskon;
-            var totaldiskon = $("#nppn").val(hasilppn);
-            // $("#diskon1").val(totaldiskon);
-            // $("#diskon1").val(formatRupiah($('#diskon1').val(), ""));
+            // var totaldiskon = $("#nppn").val(hasilppn);
+            var totaldiskon = parseInt($('#ttlhrg').val()) - (parseInt($('#ttlhrg').val())*(parseInt($("#ndiskon").val())/100));
+            $("#diskon1").val(totaldiskon);
+            $("#diskon1").val(formatRupiah($('#diskon1').val(), ""));
             
             // var totppn   = parseInt($('#ttlhrg').val()) * parseInt($('#nppn').val()) / 100;
             // var hasilppn = parseInt($('#ttlhrg').val()) - parseInt(totppn);
-            var hasilppn = $("#nppn").val(hasilppn);
-            // $('#ppn1').val(33);
-            // $('#ppn1').val(formatRupiah($('#ppn1').val(), ""));
+            // var hasilppn = $("#nppn").val(hasilppn);
+            var hasilppn = totaldiskon + (totaldiskon*($('#nppn').val()/100));
+            $('#ppn1').val(hasilppn);
+            $('#ppn1').val(formatRupiah($('#ppn1').val(), ""));
             
 		}
 	});
