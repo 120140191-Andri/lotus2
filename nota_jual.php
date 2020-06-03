@@ -255,7 +255,7 @@ function tampil_datax(nonota){
                     <script type="text/javascript">
                         $('.ubahbayar').click(function(){
                             var idbayar  = $('.idb').val();
-                            var sisaedit = $('#edtsisabayar').val();
+                            var sisaedit = $('#edtsisabayar').val() - $('#edtnominal').val();
                             // var sisaedit = $('#sisa').val();
                             var nomedit  = $('#edtnominal').val();
                             var nombef   = $('#edtnominalbef').val();
