@@ -12,6 +12,7 @@
         {
             //mysqli_query($db,"SELECT * FROM bayar_nota_jual INNER JOIN karyawan ON bayar_nota_jual.karyawan_id=karyawan.karyawan_id group by karyawan.karyawan_id" );
             $datay=array(
+                "idb"     => $row['id_bayar'],
                 "tgl"     => date('d/m/Y',strtotime($row['tgl_bayar'])),
                 "nominal" => $row['jumlah'],
                 "st"      => 'Angsur',
