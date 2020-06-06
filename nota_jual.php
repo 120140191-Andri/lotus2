@@ -85,7 +85,7 @@ $(document).ready(function(){
         $("#diskon").val(totaldiskon);
         // alert(totaldiskon);
         $("#diskon1").val(totaldiskon);
-        $("#diskon1").val(formatRupiah($('#diskon1').val(), ""));
+        $("#diskon1").val("Rp. "+formatRupiah($('#diskon1').val(), "Rp"));
 
         var ppn = $(this).attr("data-ppn");
         // var totppn   = parseInt(totaljl) * parseInt(ppn) / 100;
@@ -95,7 +95,7 @@ $(document).ready(function(){
         $("#ppn").val(hasilppn);
         // alert(hasilppn);
         $('#ppn1').val(hasilppn);
-        $('#ppn1').val(formatRupiah($('#ppn1').val(), ""));
+        $('#ppn1').val("Rp. "+formatRupiah($('#ppn1').val(), "Rp. "));
 
         var tenor = $(this).attr("data-tenor");
         $('.itenor').val(tenor);
@@ -104,7 +104,7 @@ $(document).ready(function(){
 
         var sisa = $(this).attr("data-sisa");
         $("#sisa").val(sisa);
-        $("#sisa2").val(formatRupiah(sisa, ""));
+        $("#sisa2").val("Rp. "+formatRupiah(sisa, "Rp. "));
         
         var operator = $(this).attr("operator");
         $("#operator").val(operator);
@@ -162,7 +162,7 @@ function tampil_datax(nonota){
                     <td style="text-align:center">`+ formatRupiah(value.nominal, "Rp:") +`</td>
                     <td style="text-align:center">`+ formatRupiah(value.sisa, "Rp:") +`</td>
                     <td style="text-align:center">
-                        <a class="btn btn-primary editdt" data-toggle="modal" data-editsisa="`+ value.sisa +`" data-editnominal="`+ value.nominal +`" data-editid="`+ value.idb +`" data-target="#Modaledit">Edit</a>
+                        <a class="btn btn-primary editdt" data-toggle="modal" data-editsisa="`+ value.sisa +`" data-editnominal="`+ value.nominal +`" data-editid="`+ value.idb +`" data-target="#Modaledit">Ubah</a>
                         &nbsp;
                         <a class="btn btn-danger hpsdt" data-hpsid="`+ value.idb +`">Hapus</a>
                     </td>
@@ -294,12 +294,15 @@ function tampil_datax(nonota){
                                 $('#edtnominal1').val(insisaedt);
                                 $('#edtnominal').val(sisaedt);
                                 $('#notif').show();
-                            }
-
-                            if ($('#edtnominal1').val() != "" && $('#edtnominal1').val() != "0"){
-                                $('.ubahbayar').prop('disabled', false);
-                            }else{
                                 $('.ubahbayar').prop('disabled', true);
+                            } else {
+
+                                if ($('#edtnominal1').val() != "" && $('#edtnominal1').val() != "0"){
+                                    $('.ubahbayar').prop('disabled', false);
+                                }else{
+                                    $('.ubahbayar').prop('disabled', true);
+                                }
+
                             }
 
                         });
@@ -599,7 +602,7 @@ function tampil_datax(nonota){
                         <tbody>
                         <?php
                             // ( 1 * penjualan_jumlah) 1 = harga penjualan nanti
-                            $transaksi = mysqli_query($db,"SELECT *,SUM( barang_harga * penjualan_jumlah ) AS total FROM penjualan INNER JOIN transaksi ON penjualan.transaksi_id=transaksi.transaksi_id INNER JOIN barang ON penjualan.barang_id=barang.barang_id GROUP BY transaksi.transaksi_id");
+                            $transaksi = mysqli_query($db,"SELECT *,SUM( barang_harga * penjualan_jumlah ) AS total FROM penjualan INNER JOIN transaksi ON penjualan.transaksi_id=transaksi.transaksi_id INNER JOIN barang ON penjualan.barang_id=barang.barang_id GROUP BY transaksi.transaksi_id ORDER BY transaksi_status DESC");
                             $i = 0;
 
                             while($row = mysqli_fetch_array($transaksi))
@@ -619,7 +622,16 @@ function tampil_datax(nonota){
                                 $sts = "Kredit";
                             }
 
+                            $cekbayar = mysqli_query($db, "SELECT id_bayar,tgl_bayar FROM bayar_nota_jual WHERE transaksi_id='$nota' ORDER BY id_bayar DESC");
+                            $dt = mysqli_fetch_array($cekbayar);
+
                             if ($row['transaksi_proses'] == 1) :
+                                $tgl   = new DateTime($dt['tgl_bayar']);
+                                $skrng = new DateTime(date('Y-m-d'));
+                            
+                                $hari = $skrng->diff($tgl)->days + 1;
+                                
+                                if ($hari < 60 || $status != 1) :
                         ?>  
                         <tr>
                             <td><?= $i ?></td>
@@ -690,7 +702,6 @@ function tampil_datax(nonota){
                                         <a disabled='disabled' class="btn btn-secondary disabled badge_status_non_aktif">Detail</a>
                                     <?php endif; ?>
                                 </div>
-                                
 
                             </td>
                             <!-- <td style="width:8%;text-align:center;">
@@ -706,6 +717,7 @@ function tampil_datax(nonota){
                             <!-- </td> -->
                         </tr>
                         <?php
+                                endif;
                             endif;
                             } 
                         ?>

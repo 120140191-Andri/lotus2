@@ -97,14 +97,14 @@ $(document).ready(function(){
 
         var notrans = $(this).attr('data-transaksi');
         $('#notrans').val(notrans);
-
-        tampil_datax(notrans);
         
         var detail = $(this).attr("detail");
-        
+        tampil_datax(notrans,detail);
+
         $('.entryfield6').show(1000);
 
         if (detail == "True"){
+            // $('#tb-dt').prop('.ubah-btn', 'disabled', true);
             $('#rpsisa').text("Lunas");
             $('#nominal_bayar').val("");
             $('#totsis').val("");
@@ -112,6 +112,7 @@ $(document).ready(function(){
             $('#rpinp').text("");
             $('.konfir').hide();
         }else{
+            // $('.ubah-btn').show();
             $('.konfir').show();
         }
 
@@ -122,9 +123,9 @@ $(document).ready(function(){
     });
 });
 
-function tampil_datax(nonota){
+function tampil_datax(nonota,detail){
     var dt = '';
-    
+
     $.ajax({
 		type: 'POST',
 		url: "library/load_jual_barang.php",
@@ -136,6 +137,7 @@ function tampil_datax(nonota){
             $.each(dat, function(key,value) {
                 i ++;
                 total = total + value.barang_harga * value.penjualan_jumlah;
+                if (detail != "True") {       
                 dt += 
                 `<tr>
                     <td style="text-align:center">`+ value.barang_id +`</td>
@@ -144,18 +146,28 @@ function tampil_datax(nonota){
                     <td style="text-align:center"> <input type="number" min="0" class="inqty-`+value.penjualan_id+`" value="`+value.penjualan_jumlah+`"><input type="hidden" id="id_jual"> <a style="color: white;" class="ubah-btn detail-nota badge_status_aktif konfir btn-primary" data-idp="`+value.penjualan_id+`">Ubah</a></td>
                     <td style="text-align:center">`+ formatRupiah(value.barang_harga, "Rp:") +`</td>
                 </tr>`;
+                } else {
+                dt += 
+                `<tr>
+                    <td style="text-align:center">`+ value.barang_id +`</td>
+                    <td style="text-align:center">`+ value.barang_nama +`</td>
+                    <td style="text-align:center" id="pjumlah">`+ value.penjualan_jumlah +` Frame</td>
+                    <td style="text-align:center"> <input readonly type="number" min="0" class="inqty-`+value.penjualan_id+`" value="`+value.penjualan_jumlah+`"><input type="hidden" id="id_jual"> <a style="color: white; background-color: grey;" class="disabled detail-nota" data-idp="`+value.penjualan_id+`" disabled="disabled">Ubah</a></td>
+                    <td style="text-align:center">`+ formatRupiah(value.barang_harga, "Rp:") +`</td>
+                </tr>`;
+                }
                 
             });
             $('#ttlhrg').val(total);
             $('.tampil-dt').html(dt);
-            $('#totaljual').val(formatRupiah($('#ttlhrg').val(), ""));
+            $('#totaljual').val("Rp. "+formatRupiah($('#ttlhrg').val(), "Rp. "));
             
             // var hasildiskon = ($("#ndiskon").val()/100)*parseInt($('#ttlhrg').val());
             // var totaldiskon = hasilppn - hasildiskon;
             // var totaldiskon = $("#nppn").val(hasilppn);
             var totaldiskon = parseInt($('#ttlhrg').val()) - (parseInt($('#ttlhrg').val())*(parseInt($("#ndiskon").val())/100));
             $("#diskon1").val(totaldiskon);
-            $("#diskon1").val(formatRupiah($('#diskon1').val(), ""));
+            $("#diskon1").val(formatRupiah($('#diskon1').val(), "Rp. "));
             
             // var totppn   = parseInt($('#ttlhrg').val()) * parseInt($('#nppn').val()) / 100;
             // var hasilppn = parseInt($('#ttlhrg').val()) - parseInt(totppn);
@@ -443,7 +455,11 @@ $(document).ready(function(){
                                         hasil: hasil
                                     },
                                     success: function(respon) {
-                                        alert("Transaksi Berhasil Di"+respon);  
+                                        if (respon == "Pembayaran Sudah Dikonfirmasi"){
+                                            alert("Pembayaran Sudah Dikonfirmasi");
+                                        } else {
+                                            alert("Transaksi Berhasil Di"+respon);
+                                        }  
                                         window.location.href = 'konfirmasi_penjualan.php';
                                     }
                                 });
@@ -512,9 +528,15 @@ $(document).ready(function(){
                             $bayar = mysqli_fetch_assoc(mysqli_query($db,"select sum(jumlah) as tot from bayar_nota_jual where transaksi_id = '$nota'"));
                             $sisa = $row['total'] - $bayar['tot'];
 
+                            $tgl   = new DateTime($row['transaksi_tdiubah']);
+                            $skrng = new DateTime(date('Y-m-d'));
+                            
+                            $hari = $skrng->diff($tgl)->days + 1;
+
+                            if ($hari < 30 || $sts == 0) :
                         ?>  
                         <tr>
-                            <td><?= $i ?></td>
+                            <td><?= $i ?> <?= $hari ?></td>
                             <td><?php echo date('d/m/Y',strtotime($row['transaksi_tanggal']));?></td>
                             <td><?= $row['transaksi_nota'];?></td>
                             
@@ -627,6 +649,7 @@ $(document).ready(function(){
                             <!-- </td> -->
                         </tr>
                         <?php
+                            endif;
                             } 
                         ?>
                         </tbody> 
