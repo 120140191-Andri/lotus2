@@ -10,11 +10,22 @@
         $hsl = 2;
     }
 
-    $ubah = "UPDATE transaksi SET transaksi_proses='$hsl' WHERE transaksi_nota='$nonota'";
-    if(mysqli_multi_query($db, $ubah)){
-        echo $hasil;        
+    $cek = mysqli_query($db, "SELECT transaksi_proses FROM transaksi WHERE transaksi_nota='$nonota'");
+    $rd  = mysqli_fetch_array($cek);
+
+    $status = $rd['transaksi_proses'];
+
+    if($status == 0) {
+        $tgl = date('Y-m-d H:i:s');
+
+        $ubah = "UPDATE transaksi SET transaksi_proses='$hsl', transaksi_tdiubah='$tgl' WHERE transaksi_nota='$nonota'";
+        if(mysqli_multi_query($db, $ubah)){
+            echo $hasil;        
+        }else{
+            echo "ERROR: Could not able to execute $sql. " . mysqli_error($db);
+        }
     }else{
-        echo "ERROR: Could not able to execute $sql. " . mysqli_error($db);
+        echo "Pembayaran Sudah Dikonfirmasi";
     }
 
 ?>
